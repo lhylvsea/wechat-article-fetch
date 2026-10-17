@@ -3,7 +3,11 @@
 输入一篇微信公众号文章链接, 原样抓成 Markdown / JSON: 标题、公众号名称、
 作者、发布时间、正文、图片列表。不用付费 API, 不用登录。
 
-## 触发词
+Fetch a single WeChat Official Account article (`mp.weixin.qq.com/s/...`)
+into Markdown / JSON: title, account name, author, publish date, body text,
+image list. No paid API, no login.
+
+## 触发词 / Trigger phrases
 
 用户说以下任一种意思时用这个 skill:
 
@@ -11,10 +15,11 @@
 - "这篇微信文章转成 markdown"
 - 发来一个 `mp.weixin.qq.com/s/...` 链接并说要内容/全文
 
-## 用法
+## 用法 / Usage
 
 ```bash
-cd ~/workspace/custom-skills/local-wechat-article-fetch/scripts
+cd scripts
+pip install requests beautifulsoup4
 python3 fetch.py "<文章URL>" [--markdown] [--out DIR]
 ```
 
@@ -22,9 +27,9 @@ python3 fetch.py "<文章URL>" [--markdown] [--out DIR]
 - `--markdown`: 输出纯 Markdown, 顶部带 YAML frontmatter (title/account/author/date/source), 图片以内嵌 `![](url)` 形式保留在正文原位置
 - `--out DIR`: 结果写入目录文件 (`article.json` 或 `article.md`), 否则只打印到 stdout
 
-依赖: `requests`, `beautifulsoup4` (VM 上已装好, 重装: `pip install --break-system-packages requests beautifulsoup4`)
+依赖: `requests`, `beautifulsoup4`
 
-## 实现要点
+## 实现要点 / Implementation notes
 
 1. **必须用 MicroMessenger 的 UA**, 否则微信服务端返回反爬页。脚本内置 3 个
    (iOS / Android / Mac 微信), 被反爬页挡住时自动换 UA 重试 (最多 4 次)。
@@ -38,13 +43,8 @@ python3 fetch.py "<文章URL>" [--markdown] [--out DIR]
    (如 MacRoman) 会导致乱码, 必须按 meta charset 解码。
 5. 微信对出口 IP 有间歇性限流, 偶发反爬重试几次即可; 连续失败则如实报错。
 
-## 红线
+## 红线 / Rules
 
 - 只抓取用户给出的**单篇**文章链接, 不做批量爬取。
 - 遵守反爬: 失败时如实报错 (限流/文章被删/链接无效), 不编造内容。
 - 抓到的正文只按用户要求使用 (转存/总结/翻译), 不做二次分发。
-## Available connectors
-
-- Use `muse.connector_search` to find other connectors and `muse.skill_search` to find related skills.
-
-- If nothing here fits, look on the web for a maintained API or MCP server and set it up with [Custom Connectors and MCPs](/opt/muse/skills/custom-connector-setup/SKILL.md), or build a custom connector.
